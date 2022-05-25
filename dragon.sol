@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.14;
 
 contract DragonWallet {
     
@@ -194,6 +194,10 @@ contract DragonWallet {
             require(transaction.vote <= owners.length, "Invalid Vote Count");
             numConfirmationsRequired = transaction.vote;
             emit ExecuteTransaction(msg.sender, _txIndex);
+        } else if (transaction.txtype == 4) {
+            (bool success, ) = transaction.to.call(transaction.data);
+            require(success, "tx failed");
+            emit ExecuteTransaction(msg.sender, _txIndex);
         } else {
             (bool success, ) = transaction.to.call{value: transaction.value}(
                 transaction.data
@@ -259,7 +263,7 @@ contract DragonWallet {
 }
 
 contract DragonWalletSummoners {
- 
+
     DragonWallet[] public dragonwallets;
     struct DragonOwner {
         address summoner;
@@ -286,3 +290,4 @@ contract DragonWalletSummoners {
         return (dragonwallet.dragonaddress());
     }
 }
+
